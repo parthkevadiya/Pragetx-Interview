@@ -29,52 +29,52 @@ class ResultScreen extends StatelessWidget {
                 CommonText(text: "Adult : ${homeController.roomDataList[index].adultCount}"),
                 CommonText(text: "Child : ${homeController.roomDataList[index].childCount}"),
 
-                ///Code is Not perfect working
-                // Column(
-                //     crossAxisAlignment: CrossAxisAlignment.start,
-                //     children: List.generate(
-                //       homeController.roomDataList[index].adultList?.length ?? 0,
-                //       (i) => Container(
-                //         width: Get.width,
-                //         padding: const EdgeInsets.all(5),
-                //         decoration: BoxDecoration(
-                //           color: AppColor.white,
-                //           borderRadius: BorderRadius.circular(5),
-                //           boxShadow: [
-                //             BoxShadow(color: AppColor.black.withOpacity(0.15), blurRadius: 3, spreadRadius: 3)
-                //           ],
-                //         ),
-                //         child: Column(
-                //           crossAxisAlignment: CrossAxisAlignment.start,
-                //           children: [
-                //             const CommonText(text: "Adult"),
-                //             CommonText(text: homeController.roomDataList[index].adultList?[i].name),
-                //             CommonText(text: homeController.roomDataList[index].adultList?[i].age),
-                //           ],
-                //         ),
-                //       ),
-                //     )),
-                // Column(
-                //     children: List.generate(
-                //   homeController.roomDataList[index].childList?.length ?? 0,
-                //   (i) => Container(
-                //     width: Get.width,
-                //     padding: const EdgeInsets.all(5),
-                //     decoration: BoxDecoration(
-                //       color: AppColor.white,
-                //       borderRadius: BorderRadius.circular(5),
-                //       boxShadow: [BoxShadow(color: AppColor.black.withOpacity(0.15), blurRadius: 3, spreadRadius: 3)],
-                //     ),
-                //     child: Column(
-                //       crossAxisAlignment: CrossAxisAlignment.start,
-                //       children: [
-                //         const CommonText(text: "Child"),
-                //         CommonText(text: homeController.roomDataList[index].childList?[i].name),
-                //         CommonText(text: homeController.roomDataList[index].childList?[i].age),
-                //       ],
-                //     ),
-                //   ),
-                // ))
+                ///Below Code is Not perfect working
+                Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: List.generate(
+                      homeController.roomDataList[index].adultList?.length ?? 0,
+                      (i) => Container(
+                        width: Get.width,
+                        padding: const EdgeInsets.all(5),
+                        decoration: BoxDecoration(
+                          color: AppColor.white,
+                          borderRadius: BorderRadius.circular(5),
+                          boxShadow: [
+                            BoxShadow(color: AppColor.black.withOpacity(0.15), blurRadius: 3, spreadRadius: 3)
+                          ],
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const CommonText(text: "Adult"),
+                            CommonText(text: homeController.roomDataList[index].adultList?[i].name),
+                            CommonText(text: homeController.roomDataList[index].adultList?[i].age),
+                          ],
+                        ),
+                      ),
+                    )),
+                Column(
+                    children: List.generate(
+                  homeController.roomDataList[index].childList?.length ?? 0,
+                  (i) => Container(
+                    width: Get.width,
+                    padding: const EdgeInsets.all(5),
+                    decoration: BoxDecoration(
+                      color: AppColor.white,
+                      borderRadius: BorderRadius.circular(5),
+                      boxShadow: [BoxShadow(color: AppColor.black.withOpacity(0.15), blurRadius: 3, spreadRadius: 3)],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const CommonText(text: "Child"),
+                        CommonText(text: homeController.roomDataList[index].childList?[i].name),
+                        CommonText(text: homeController.roomDataList[index].childList?[i].age),
+                      ],
+                    ),
+                  ),
+                ))
               ],
             ),
           ),
