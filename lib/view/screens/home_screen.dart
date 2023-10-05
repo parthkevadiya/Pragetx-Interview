@@ -1,3 +1,4 @@
+import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
@@ -13,7 +14,6 @@ class HomeScreen extends StatelessWidget {
   HomeScreen({super.key});
 
   final homeController = Get.put<HomeController>(HomeController());
-  final formKey = GlobalKey<FormBuilderState>();
   final adultList = <TextEditingController>[];
   final childList = <TextEditingController>[];
   final adultNameList = <TextEditingController>[];
@@ -26,63 +26,68 @@ class HomeScreen extends StatelessWidget {
     final childCon = TextEditingController();
     adultList.add(adultCon);
     childList.add(childCon);
+    final formKey = GlobalKey<FormBuilderState>();
+
     return Container(
       padding: const EdgeInsets.all(5),
       decoration: BoxDecoration(
         color: AppColor.white,
         borderRadius: BorderRadius.circular(5),
         boxShadow: [
-          BoxShadow(
-            color: AppColor.black.withOpacity(0.15),
-            blurRadius: 3,
-            spreadRadius: 3,
-          ),
+          BoxShadow(color: AppColor.black.withOpacity(0.15), blurRadius: 3, spreadRadius: 3),
         ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          CommonText(text: "Room ${(index + 1)}"),
-          Row(
-            children: [
-              Expanded(
-                flex: 2,
-                child: CommonTextField(
-                  con: adultCon,
-                  hintText: "Adult",
-                  keyBoardType: TextInputType.number,
+      child: FormBuilder(
+        key: formKey,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            CommonText(text: "Room ${(index + 1)}"),
+            Row(
+              children: [
+                Expanded(
+                  flex: 2,
+                  child: CommonTextField(
+                    con: adultCon,
+                    hintText: "Adult",
+                    keyBoardType: TextInputType.number,
+                    validator: FormBuilderValidators.compose([FormBuilderValidators.required()]),
+                  ),
                 ),
-              ),
-              const SizedBox(width: 5),
-              Expanded(
-                flex: 2,
-                child: CommonTextField(
-                  con: childCon,
-                  hintText: "Child",
-                  keyBoardType: TextInputType.number,
+                const SizedBox(width: 5),
+                Expanded(
+                  flex: 2,
+                  child: CommonTextField(
+                    con: childCon,
+                    hintText: "Child",
+                    keyBoardType: TextInputType.number,
+                    validator: FormBuilderValidators.compose([FormBuilderValidators.required()]),
+                  ),
                 ),
-              ),
-              const SizedBox(width: 5),
-              Expanded(
-                flex: 1,
-                child: CommonButton(
-                  label: "ADD",
-                  onPressed: () {
-                    for (int i = 0; i < int.parse(adultCon.text); i++) {
-                      homeController.adultCards.add(createAdultCard(i));
-                      homeController.adultList.add(AdultModel(roomId: index.toString()));
-                    }
-                    for (int i = 0; i < int.parse(childCon.text); i++) {
-                      homeController.childCards.add(createChildCard(i));
-                      homeController.childList.add(ChildModel(roomId: index.toString()));
-                    }
-                  },
-                  labelColor: AppColor.white,
+                const SizedBox(width: 5),
+                Expanded(
+                  flex: 1,
+                  child: CommonButton(
+                    label: "ADD",
+                    onPressed: () {
+                      if (formKey.currentState!.validate()) {
+                        for (int i = 0; i < int.parse(adultCon.text); i++) {
+                          homeController.adultCards.add(createAdultCard(i));
+                          homeController.adultList.add(AdultModel(roomId: index.toString()));
+                        }
+                        for (int i = 0; i < int.parse(childCon.text); i++) {
+                          homeController.childCards.add(createChildCard(i));
+                          homeController.childList.add(ChildModel(roomId: index.toString()));
+                        }
+                      }
+                    },
+                    labelColor: AppColor.white,
+                  ),
                 ),
-              ),
-            ],
-          ),
-        ],
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -186,116 +191,123 @@ class HomeScreen extends StatelessWidget {
         child: SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
           child: Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: Column(
-              children: [
-                FormBuilderDropdown<int>(
-                  name: 'Room',
-                  decoration: const InputDecoration(
-                    hintText: 'Select Room',
-                    border: OutlineInputBorder(),
-                    isDense: true,
-                  ),
-                  onChanged: (v) {
-                    homeController.roomDataList.clear();
-                    homeController.roomCards.clear();
-                    homeController.adultCards.clear();
-                    homeController.childCards.clear();
-                    homeController.selectedRoom.value = v;
-                    if (homeController.selectedRoom.value != null) {
-                      for (int i = 0; i < homeController.selectedRoom.value!; i++) {
-                        homeController.roomCards.add(createCard(i));
-                      }
-                    }
-                  },
-                  items: homeController.roomList
-                      .map((e) => DropdownMenuItem(
-                            alignment: AlignmentDirectional.centerStart,
-                            value: e,
-                            child: CommonText(text: e.toString()),
-                          ))
-                      .toList(),
-                ),
-                const SizedBox(height: 10),
-                Obx(
-                  () => Column(
-                    children: List.generate(
-                      homeController.roomCards.length,
-                      (index) => Padding(
-                        padding: const EdgeInsets.all(5.0),
-                        child: Column(
-                          children: [
-                            homeController.roomCards[index],
-                            Column(
+              padding: const EdgeInsets.all(10.0),
+              child: Obx(
+                () => homeController.load.value
+                    ? const Center(child: CircularProgressIndicator())
+                    : Column(
+                        children: [
+                          FormBuilderDropdown<int>(
+                            name: 'Room',
+                            decoration: const InputDecoration(
+                              hintText: 'Select Room',
+                              border: OutlineInputBorder(),
+                              isDense: true,
+                            ),
+                            onChanged: (v) {
+                              homeController.roomDataList.clear();
+                              homeController.roomCards.clear();
+                              homeController.adultCards.clear();
+                              homeController.childCards.clear();
+                              homeController.selectedRoom.value = v;
+                              if (homeController.selectedRoom.value != null) {
+                                for (int i = 0; i < homeController.selectedRoom.value!; i++) {
+                                  homeController.roomCards.add(createCard(i));
+                                }
+                              }
+                            },
+                            items: homeController.roomList
+                                .map((e) => DropdownMenuItem(
+                                      alignment: AlignmentDirectional.centerStart,
+                                      value: e,
+                                      child: CommonText(text: e.toString()),
+                                    ))
+                                .toList(),
+                          ),
+                          const SizedBox(height: 10),
+                          Obx(
+                            () => Column(
                               children: List.generate(
-                                homeController.adultCards.length,
-                                (i) => int.tryParse(homeController.adultList[i].roomId ?? "0") == index
-                                    ? homeController.adultCards[i]
-                                    : const SizedBox(),
+                                homeController.roomCards.length,
+                                (index) => Padding(
+                                  padding: const EdgeInsets.all(5.0),
+                                  child: Column(
+                                    children: [
+                                      homeController.roomCards[index],
+                                      Column(
+                                        children: List.generate(
+                                          homeController.adultCards.length,
+                                          (i) => int.tryParse(homeController.adultList[i].roomId ?? "0") == index
+                                              ? homeController.adultCards[i]
+                                              : const SizedBox(),
+                                        ),
+                                      ),
+                                      Column(
+                                        children: List.generate(
+                                          homeController.childCards.length,
+                                          (j) => int.tryParse(homeController.childList[j].roomId ?? "0") == index
+                                              ? homeController.childCards[j]
+                                              : const SizedBox(),
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                ),
                               ),
                             ),
-                            Column(
-                              children: List.generate(
-                                homeController.childCards.length,
-                                (j) => int.tryParse(homeController.childList[j].roomId ?? "0") == index
-                                    ? homeController.childCards[j]
-                                    : const SizedBox(),
-                              ),
-                            )
-                          ],
-                        ),
+                          ),
+                          const SizedBox(height: 10),
+                          CommonButton(
+                            label: "Submit",
+                            labelColor: AppColor.white,
+                            onPressed: () {
+                              print(homeController.childCards.length);
+                              List<AdultModel> tempAdultList = [];
+                              List<ChildModel> tempChildList = [];
+                              int j = 0;
+                              homeController.roomDataList.clear();
+                              if (homeController.selectedRoom.value != null) {
+                                for (j; j < homeController.roomCards.length; j++) {
+                                  String adult = adultList[j].text;
+                                  String child = childList[j].text;
+                                  if (j < 1) {
+                                    if (homeController.adultCards.isNotEmpty) {
+                                      for (int i = 0; i < homeController.adultCards.length; i++) {
+                                        String adultName = adultNameList[i].text;
+                                        String adultAge = adultAgeList[i].text;
+                                        for (int i = 0; i < homeController.adultList.length; i++) {
+                                          tempAdultList
+                                              .add(AdultModel(name: adultName, age: adultAge, roomId: "${i + 1}"));
+                                        }
+                                      }
+                                    }
+                                    if (homeController.childCards.isNotEmpty) {
+                                      for (int i = 0; i < homeController.childCards.length; i++) {
+                                        String childName = childNameList[i].text;
+                                        String childAge = childAgeList[i].text;
+                                        tempChildList
+                                            .add(ChildModel(name: childName, age: childAge, roomId: "${i + 1}"));
+                                      }
+                                    }
+                                  }
+                                  homeController.roomDataList.add(
+                                    RoomDataModel(
+                                      adultCount: adult,
+                                      childCount: child,
+                                      roomName: "Room ${j + 1}",
+                                      adultList: tempAdultList,
+                                      childList: tempChildList,
+                                    ),
+                                  );
+                                }
+                              }
+                              // print(homeController.roomDataList);
+                              Get.to(() => ResultScreen());
+                            },
+                          )
+                        ],
                       ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 10),
-                CommonButton(
-                  label: "Submit",
-                  labelColor: AppColor.white,
-                  onPressed: () {
-                    List<AdultModel> tempAdultList = [];
-                    List<ChildModel> tempChildList = [];
-                    int j = 0;
-                    homeController.roomDataList.clear();
-                    if (homeController.selectedRoom.value != null) {
-                      for (int i = 0; i < homeController.selectedRoom.value!; i++) {
-                        for (j; j < homeController.roomCards.length; j++) {
-                          String adult = adultList[j].text;
-                          String child = childList[j].text;
-                          if (homeController.adultCards.isNotEmpty) {
-                            for (int i = 0; i < homeController.adultCards.length; i++) {
-                              String adultName = adultNameList[i].text;
-                              String adultAge = adultAgeList[i].text;
-                              tempAdultList.add(AdultModel(name: adultName, age: adultAge, roomId: "${j + 1}"));
-                            }
-                          }
-                          if (homeController.childCards.isNotEmpty) {
-                            for (int i = 0; i < homeController.childCards.length; i++) {
-                              String childName = childNameList[i].text;
-                              String childAge = childAgeList[i].text;
-                              tempChildList.add(ChildModel(name: childName, age: childAge));
-                            }
-                          }
-
-                          homeController.roomDataList.add(
-                            RoomDataModel(
-                              adultCount: adult,
-                              childCount: child,
-                              roomName: "Room ${j + 1}",
-                              adultList: tempAdultList,
-                              childList: tempChildList,
-                            ),
-                          );
-                        }
-                      }
-                    }
-                    // print(homeController.roomDataList);
-                    Get.to(() => ResultScreen());
-                  },
-                )
-              ],
-            ),
-          ),
+              )),
         ),
       ),
     );

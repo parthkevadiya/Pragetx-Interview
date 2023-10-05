@@ -12,4 +12,10 @@ class HomeController extends GetxController {
 
   RxList<AdultModel> adultList = <AdultModel>[].obs;
   RxList<ChildModel> childList = <ChildModel>[].obs;
+  RxBool load = true.obs;
+  @override
+  void onInit() {
+    super.onInit();
+    Future.delayed(const Duration(seconds: 3), () => load.value = false);
+  }
 }
